@@ -1,10 +1,13 @@
-import { includes, omit, partial } from 'lodash'
+import { flow, includes, omit, partial, partialRight } from 'lodash'
 import { parse, format } from 'url'
 import Wreck from 'wreck'
 import Boom from 'boom'
 import humps from 'lodash-humps'
 import normalizeUrl from 'normalize-url'
+import { setField } from 'cape-lodash'
 import processItem from './embedly'
+
+const parseUrl = partialRight(parse, true, true)
 
 const KEY = '9e73207156cb402abab1436405e3b515'
 
@@ -29,20 +32,20 @@ export const isYoutube = partial(includes, ['youtu.be', 'youtube.com', 'www.yout
 export function preferHttps({ hostname, protocol }) {
   return useSSL[hostname] ? 'https:' : protocol
 }
-export function rmExtraYoutube(urlParts) {
+export function rmExtraYoutube(urlString) {
+  const urlParts = parseUrl(urlString)
   if (isYoutube(urlParts.hostname) && urlParts.query.feature) {
-    return omit(urlParts, ['query.feature', 'path', 'search'])
+    return format(omit(urlParts, ['query.feature', 'path', 'search']))
   }
-  return urlParts
+  return urlString
 }
-export function urlFix(url) {
-  const urlParts = parse(normalizeUrl(url), true)
-  urlParts.protocol = preferHttps(urlParts)
-  return {
-    ...urlParts,
-    href: format(rmExtraYoutube(urlParts)),
-  }
-}
+export const urlFix = flow(
+  normalizeUrl,
+  rmExtraYoutube,
+  parseUrl,
+  setField('protocol', preferHttps),
+  setField('href', format)
+)
 
 // Correct the url input. Follow redirects and such.
 export function urlCheck(originalUrl, callback) {
@@ -64,7 +67,7 @@ export function urlCheck(originalUrl, callback) {
     }
   }
   // @TODO Need to have an auto https checker in here somewhere.
-  wreck.request('HEAD', url, { redirected: redirectedCallback }, (err, response) => {
+  wreck.request('HEAD', url.href, { redirected: redirectedCallback }, (err, response) => {
     if (err) {
       err.output.payload.url = url
       return callback(err)

@@ -13,13 +13,17 @@ test('urlFix', (t) => {
   t.equal(res2.href, 'https://youtu.be/8zsBaFTRprk')
   const res3 = urlFix(url3)
   t.equal(res3.href, 'https://youtube.com/watch?v=8zsBaFTRprk')
+  t.equal(res3.path, '/watch?v=8zsBaFTRprk')
+  t.deepEqual(res3.query, { v: '8zsBaFTRprk' })
   t.end()
 })
-// test('urlCheckPromise', (t) => {
-//   urlCheckPromise(url2)
-//   .then((res) => {
-//     console.log(res)
-//   })
-//   t.end()
-// })
+test('urlCheckPromise', (t) => {
+  urlCheckPromise(url2)
+  .then((res) => {
+    t.equal(res.url.href, 'https://youtube.com/watch?v=8zsBaFTRprk')
+    console.log(res)
+    t.end()
+  })
+  .catch((err) => { console.error(err.stack); t.fail(err) })
+})
 // urlInfo('vimeo.com/64954354').then(console.log)
