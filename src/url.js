@@ -1,7 +1,9 @@
+import { includes, omit, partial } from 'lodash'
 import { parse, format } from 'url'
 import Wreck from 'wreck'
 import Boom from 'boom'
 import humps from 'lodash-humps'
+import normalizeUrl from 'normalize-url'
 import processItem from './embedly'
 
 const KEY = '9e73207156cb402abab1436405e3b515'
@@ -19,27 +21,27 @@ const useSSL = {
   'mica2015.imgix.net': true,
   'vimeo.com': true,
   'youtu.be': true,
+  'youtube.com': true,
   'www.youtube.com': true,
   'soundcloud.com': true,
 }
-
-export function urlFix(url) {
-  const urlParts = parse(url, true)
-  const { hostname, protocol, query } = urlParts
-  if (protocol === 'http:') {
-    if (useSSL[hostname]) {
-      urlParts.protocol = 'https:'
-    }
+export const isYoutube = partial(includes, ['youtu.be', 'youtube.com', 'www.youtube.com'])
+export function preferHttps({ hostname, protocol }) {
+  return useSSL[hostname] ? 'https:' : protocol
+}
+export function rmExtraYoutube(urlParts) {
+  if (isYoutube(urlParts.hostname) && urlParts.query.feature) {
+    return omit(urlParts, ['query.feature', 'path', 'search'])
   }
-  if (hostname === 'www.youtube.com') {
-    if (query.feature) {
-      delete urlParts.query.feature
-      delete urlParts.path
-      delete urlParts.search
-    }
-  }
-  urlParts.href = format(urlParts)
   return urlParts
+}
+export function urlFix(url) {
+  const urlParts = parse(normalizeUrl(url), true)
+  urlParts.protocol = preferHttps(urlParts)
+  return {
+    ...urlParts,
+    href: format(rmExtraYoutube(urlParts)),
+  }
 }
 
 // Correct the url input. Follow redirects and such.
@@ -95,21 +97,36 @@ export function urlCheck(originalUrl, callback) {
   })
 }
 
-export function urlInfo({ url, urls, ...rest }, callback) {
-  const reqUrl = `http://api.embed.ly/1/oembed?key=${KEY}&url=${encodeURIComponent(url.href)}`
+export function urlCheckPromise(urlString) {
+  return new Promise((success, reject) => {
+    urlCheck(urlString, (err, res) => {
+      if (err) return reject(err)
+      return success(res)
+    })
+  })
+}
+export function embedlyUrl(href) {
+  return `http://api.embed.ly/1/oembed?key=${KEY}&url=${encodeURIComponent(href)}`
+}
+export function urlInfo(urlString) {
+  return new Promise((success, reject) => {
+    urlCheckPromise(urlString).then(({ url, urls }) => {
+      const reqUrl = embedlyUrl(url.href)
 
-  wreck.get(reqUrl, { json: true }, (err2, response, payload) => {
-    if (err2) return callback(err2)
-    const data = humps(payload)
-    if (data.url) {
-      const fixedEmbedlyUrl = urlFix(data.url)
-      urls.add(fixedEmbedlyUrl.href)
-      data.url = fixedEmbedlyUrl
-    } else {
-      data.url = url
-    }
-    data.urls = Array.from(urls)
-    const info = processItem(data)
-    return callback(err2, info)
+      wreck.get(reqUrl, { json: true }, (err2, response, payload) => {
+        if (err2) return reject(err2)
+        const data = humps(payload)
+        if (data.url) {
+          const fixedEmbedlyUrl = urlFix(data.url)
+          urls.add(fixedEmbedlyUrl.href)
+          data.url = fixedEmbedlyUrl
+        } else {
+          data.url = url
+        }
+        data.urls = Array.from(urls)
+        const info = processItem(data)
+        return success(info)
+      })
+    })
   })
 }
