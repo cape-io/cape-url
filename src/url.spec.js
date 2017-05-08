@@ -1,5 +1,5 @@
 import test from 'tape'
-import { urlFix, urlCheckPromise } from './url'
+import { urlFix, urlCheckPromise, urlInfo } from './url'
 
 const url1 = 'youtube.com:80/watch?v=8zsBaFTRprk'
 const url2 = 'https://youtu.be/8zsBaFTRprk'
@@ -21,9 +21,19 @@ test('urlCheckPromise', (t) => {
   urlCheckPromise(url2)
   .then((res) => {
     t.equal(res.url.href, 'https://youtube.com/watch?v=8zsBaFTRprk')
+    t.equal(res.url.hostname, 'youtube.com')
+    t.end()
+  })
+  .catch((err) => {
+    console.error(err.stack)
+    t.fail(err)
+  })
+})
+test('urlInfo', (t) => {
+  urlInfo(url2)
+  .then((res) => {
     console.log(res)
     t.end()
   })
-  .catch((err) => { console.error(err.stack); t.fail(err) })
 })
 // urlInfo('vimeo.com/64954354').then(console.log)

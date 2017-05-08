@@ -6,6 +6,7 @@ import humps from 'lodash-humps'
 import normalizeUrl from 'normalize-url'
 import { setField } from 'cape-lodash'
 import processItem from './embedly'
+import fetch from './fetch'
 
 const parseUrl = partialRight(parse, true, true)
 
@@ -112,24 +113,22 @@ export function embedlyUrl(href) {
   return `http://api.embed.ly/1/oembed?key=${KEY}&url=${encodeURIComponent(href)}`
 }
 export function urlInfo(urlString) {
-  return new Promise((success, reject) => {
-    urlCheckPromise(urlString).then(({ url, urls }) => {
-      const reqUrl = embedlyUrl(url.href)
-
-      wreck.get(reqUrl, { json: true }, (err2, response, payload) => {
-        if (err2) return reject(err2)
-        const data = humps(payload)
-        if (data.url) {
-          const fixedEmbedlyUrl = urlFix(data.url)
-          urls.add(fixedEmbedlyUrl.href)
-          data.url = fixedEmbedlyUrl
-        } else {
-          data.url = url
-        }
-        data.urls = Array.from(urls)
-        const info = processItem(data)
-        return success(info)
-      })
+  return urlCheckPromise(urlString)
+    .then(info => Promise.all([
+      info,
+      fetch(embedlyUrl(info.url.href), { json: true }),
+    ]))
+    .then(([{ url, urls }, { payload }]) => {
+      const data = humps(payload)
+      if (data.url) {
+        const fixedEmbedlyUrl = urlFix(data.url)
+        urls.add(fixedEmbedlyUrl.href)
+        data.url = fixedEmbedlyUrl
+      } else {
+        data.url = url
+      }
+      data.urls = Array.from(urls)
+      const info = processItem(data)
+      return info
     })
-  })
 }
