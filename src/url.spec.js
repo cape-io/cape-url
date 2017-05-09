@@ -37,11 +37,11 @@ test('urlInfo', (t) => {
     t.equal(res.id, '4d15cee3f7d6083e811eedcf4ddcce944432fb2a')
     t.equal(get(res, 'image.height'), 360)
     t.equal(res.linkType, 'VideoObject')
-    t.equal(res.author, {
+    t.deepEqual(res.author, {
       name: 'Sailing SV Delos',
       url: 'https://www.youtube.com/user/briantrautman',
     })
-    t.equal(res.provider, {
+    t.deepEqual(res.provider, {
       name: 'YouTube',
       url: 'https://www.youtube.com/',
       version: '1.0',
