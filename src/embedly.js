@@ -1,48 +1,56 @@
-import { merge } from 'lodash'
+import { flow } from 'lodash'
+import sha1 from 'node-sha1'
+import { setWith } from 'cape-lodash'
 
-export default function processItem(rawItem) {
-  const {
-    authorName, authorUrl,
-    description,
-    height, html,
-    providerName, providerUrl,
-    thumbnailUrl, thumbnailHeight, thumbnailWidth, title, type,
-    version,
-    width,
-    ...rest
-  } = rawItem
-  const info = {
+export function getAuthor({ authorName, authorUrl, ...rest }) {
+  return {
+    ...rest,
     author: {
       name: authorName,
       url: authorUrl,
     },
-    data: {
-      description,
-      title,
-      html,
-      rest,
+  }
+}
+export function getImage({ thumbnailUrl, thumbnailHeight, thumbnailWidth, ...rest }) {
+  if (!thumbnailUrl) return rest
+  // Perhaps change the thumbnailUrl when ImageObject?
+  return {
+    ...rest,
+    image: {
+      height: thumbnailHeight,
+      url: thumbnailUrl,
+      width: thumbnailWidth,
     },
-    preview: {
-      image: thumbnailUrl ? { url: thumbnailUrl, height: thumbnailHeight, width: thumbnailWidth } : undefined,
-    },
+  }
+}
+export const linkTypes = {
+  audio: 'AudioObject',
+  photo: 'ImageObject',
+  video: 'VideoObject',
+}
+export const getLinkType = ({ type, ...rest }) => ({
+  ...rest,
+  linkType: linkTypes[type] || type,
+})
+
+export function getProvider({ providerName, providerUrl, version, ...rest }) {
+  return {
+    ...rest,
     provider: {
       name: providerName,
       url: providerUrl,
       version,
     },
-    size: {
-      height,
-      width,
-    },
-    type: type === 'photo' ? 'image' : type,
   }
-
-  if (!info.preview.image && info.type === 'image') {
-    info.preview.image = { url: rawItem.url.href, ...info.size }
-  }
-  return merge(rest, info)
 }
 
+export default flow(
+  getAuthor,
+  getImage,
+  getLinkType,
+  getProvider,
+  setWith('id', 'url.href', sha1),
+)
 
 // content:
 //   raw: (anything)
@@ -90,9 +98,6 @@ export default function processItem(rawItem) {
 //     fieldId: (string)
 //     userId: (string)
 // taxonomy: (object) probably?
-// time:
-//   created: (dateTime) time created
-//   updated: (dateTime) last modified
 // title: (string)
 // type: (string) (event, video, image, audio, website)
 // url: (url) Corrected URL. Allow custom scheme.

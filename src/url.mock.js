@@ -1,0 +1,33 @@
+export const data1 = {
+  "providerUrl":"https://www.youtube.com/",
+  "description":"In this episode we sail through the roaring 40s and it was crazy! Definitely the most intense part of our 3000NM passage from South Africa to La Reunion. We had wind speeds of over 50kn, 23-32ft (7-10m) waves and in the middle of everything our autopilot breaks and it's hand steering from now on!","title":"Sailing the Roaring 40s in 30 foot Waves! Sailing SV Delos Ep. 107",
+  "url":"http://www.youtube.com/watch?v=8zsBaFTRprk",
+  "authorName":"Sailing SV Delos",
+  "height":480,
+  "thumbnailWidth":480,
+  "width":854,
+  "html":"<iframe class=\"embedly-embed\" src=\"//cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2F8zsBaFTRprk%3Ffeature%3Doembed&url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D8zsBaFTRprk&image=https%3A%2F%2Fi.ytimg.com%2Fvi%2F8zsBaFTRprk%2Fhqdefault.jpg&key=c84345abd20e4aa6942cddd9ef56d787&type=text%2Fhtml&schema=youtube\" width=\"854\" height=\"480\" scrolling=\"no\" frameborder=\"0\" allowfullscreen></iframe>",
+  "authorUrl":"https://www.youtube.com/user/briantrautman",
+  "version":"1.0",
+  "providerName":"YouTube",
+  "thumbnailUrl":"https://i.ytimg.com/vi/8zsBaFTRprk/hqdefault.jpg",
+  "type":"video",
+  "thumbnailHeight":360,
+}
+export const data2 = {
+  "providerUrl":"https://www.youtube.com/",
+  "description":"In this episode we sail through the roaring 40s and it was crazy! Definitely the most intense part of our 3000NM passage from South Africa to La Reunion. We had wind speeds of over 50kn, 23-32ft (7-10m) waves and in the middle of everything our autopilot breaks and it's hand steering from now on!","title":"Sailing the Roaring 40s in 30 foot Waves! Sailing SV Delos Ep. 107",
+  "url":{"protocol":"https:","slashes":true,"auth":null,"host":"youtube.com","port":null,"hostname":"youtube.com","hash":null,"search":"?v=8zsBaFTRprk","query": {"v":"8zsBaFTRprk"},"pathname":"/watch","path":"/watch?v=8zsBaFTRprk","href":"https://youtube.com/watch?v=8zsBaFTRprk"},
+  "authorName":"Sailing SV Delos",
+  "height":480,
+  "thumbnailWidth":480,
+  "width":854,
+  "html":"<iframe class=\"embedly-embed\" src=\"//cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2F8zsBaFTRprk%3Ffeature%3Doembed&url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D8zsBaFTRprk&image=https%3A%2F%2Fi.ytimg.com%2Fvi%2F8zsBaFTRprk%2Fhqdefault.jpg&key=c84345abd20e4aa6942cddd9ef56d787&type=text%2Fhtml&schema=youtube\" width=\"854\" height=\"480\" scrolling=\"no\" frameborder=\"0\" allowfullscreen></iframe>",
+  "authorUrl":"https://www.youtube.com/user/briantrautman",
+  "version":"1.0",
+  "providerName":"YouTube",
+  "thumbnailUrl":"https://i.ytimg.com/vi/8zsBaFTRprk/hqdefault.jpg",
+  "type":"video",
+  "thumbnailHeight":360,
+  "urls":["https://youtu.be/8zsBaFTRprk","https://www.youtube.com/watch?v=8zsBaFTRprk&feature=youtu.be","https://youtube.com/watch?v=8zsBaFTRprk"]
+}

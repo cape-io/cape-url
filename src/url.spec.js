@@ -1,4 +1,5 @@
 import test from 'tape'
+import { get } from 'lodash'
 import { urlFix, urlCheckPromise, urlInfo } from './url'
 
 const url1 = 'youtube.com:80/watch?v=8zsBaFTRprk'
@@ -32,8 +33,24 @@ test('urlCheckPromise', (t) => {
 test('urlInfo', (t) => {
   urlInfo(url2)
   .then((res) => {
-    console.log(res)
+    // console.log(res)
+    t.equal(res.id, '4d15cee3f7d6083e811eedcf4ddcce944432fb2a')
+    t.equal(get(res, 'image.height'), 360)
+    t.equal(res.linkType, 'VideoObject')
+    t.equal(res.author, {
+      name: 'Sailing SV Delos',
+      url: 'https://www.youtube.com/user/briantrautman',
+    })
+    t.equal(res.provider, {
+      name: 'YouTube',
+      url: 'https://www.youtube.com/',
+      version: '1.0',
+    })
     t.end()
+  })
+  .catch((err) => {
+    console.error(err.stack)
+    t.fail(err)
   })
 })
 // urlInfo('vimeo.com/64954354').then(console.log)
