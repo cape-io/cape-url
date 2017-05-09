@@ -125,7 +125,7 @@ export function handleEmbedlyData([{ url, urls }, { dataFeedElement }]) {
   return processItem(data)
 }
 
-export function urlInfo(urlString) {
+export default function urlInfo(urlString) {
   return urlCheckPromise(urlString)
     .then(info => Promise.all([
       info,

@@ -1,6 +1,6 @@
 import test from 'tape'
 import { get } from 'lodash'
-import { urlFix, urlCheckPromise, urlInfo } from './url'
+import { urlFix, urlCheckPromise, urlInfo } from './'
 
 const url1 = 'youtube.com:80/watch?v=8zsBaFTRprk'
 const url2 = 'https://youtu.be/8zsBaFTRprk'
