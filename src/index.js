@@ -1,7 +1,6 @@
 import { flow, includes, omit, partial, partialRight } from 'lodash'
 import { parse, format } from 'url'
 import Wreck from 'wreck'
-import Boom from 'boom'
 import normalizeUrl from 'normalize-url'
 import { setField } from 'cape-lodash'
 import fetch from 'cape-fetch'
@@ -69,7 +68,7 @@ export function urlCheck(originalUrl, callback) {
   // @TODO Need to have an auto https checker in here somewhere.
   wreck.request('HEAD', url.href, { redirected: redirectedCallback }, (err, response) => {
     if (err) {
-      err.output.payload.url = url
+      console.error(err)
       return callback(err)
     }
     const { headers, statusCode, statusMessage } = response
@@ -78,14 +77,9 @@ export function urlCheck(originalUrl, callback) {
         return urlCheck(headers.location, callback)
       }
       const code = statusCode >= 400 ? statusCode : 500
-      const err2 = Boom.create(code, statusMessage)
-      err2.output.payload.url = url
-      if (code !== statusCode) {
-        err2.output.payload.message = `Could not handle response code ${statusCode}`
-        err2.output.payload.headers = headers
-        // err2.output.payload.
-      }
-      return callback(err2)
+      console.error(code, statusMessage)
+      console.error(`Could not handle response code ${statusCode}`, headers)
+      return callback({ code, statusMessage, headers })
     }
     const info = {
       headers,
