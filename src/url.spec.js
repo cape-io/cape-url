@@ -1,6 +1,6 @@
 import test from 'tape'
 import { get } from 'lodash'
-import { urlFix, urlCheckPromise, urlInfo } from './'
+import urlInfo, { urlFix, urlCheckPromise } from './'
 
 const url1 = 'youtube.com:80/watch?v=8zsBaFTRprk'
 const url2 = 'https://youtu.be/8zsBaFTRprk'
@@ -46,6 +46,13 @@ test('urlInfo', (t) => {
       url: 'https://www.youtube.com/',
       version: '1.0',
     })
+    return 'http://vimeo.com/64954354#'
+  })
+  .then(urlInfo).then((res) => {
+    // console.log(res)
+    t.deepEqual(res.author, { name: 'Paul Shapiro', url: 'https://vimeo.com/user4799794' })
+    t.deepEqual(res.provider, { name: 'Vimeo', url: 'https://vimeo.com/', version: '1.0' })
+    t.equal(res.linkType, 'VideoObject')
     t.end()
   })
   .catch((err) => {
